@@ -1,7 +1,7 @@
 # Use official nginx alpine image with exact pinned version
 FROM nginx:1.26.2-alpine3.20
 
-# Copy simple nginx configuration for Invoice Ninja FastCGI proxy
+# Copy nginx configuration for Firefly III reverse proxy
 COPY ops/docker/nginx/config/default.conf /etc/nginx/conf.d/default.conf
 
 # Health check
