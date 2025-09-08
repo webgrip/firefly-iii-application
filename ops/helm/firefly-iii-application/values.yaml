@@ -110,6 +110,21 @@ application:
                 secretKeyRef:
                   name: firefly-iii-application-secrets
                   key: update-secret
+            - name: WEBCRON_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-application-secrets
+                  key: webcron-secret
+
+            # Additional Firefly III configuration
+            - name: IS_DOCKER
+              value: "true"
+            - name: FILESYSTEM_DRIVER
+              value: local
+            - name: EXPANDED_LOGGING
+              value: "true"
+            - name: PDF_GENERATOR
+              value: snappdf
           resources:
             requests:
               cpu: "250m"
