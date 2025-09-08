@@ -1,8 +1,8 @@
-namespace: application-application
+namespace: firefly-iii-application
 
 _shared_config:
-  hostname: &hostname application-application.staging.k8s.webgrip.nl
-  url: &url https://application-application.staging.k8s.webgrip.nl
+  hostname: &hostname firefly-iii-application.staging.k8s.webgrip.nl
+  url: &url https://firefly-iii-application.staging.k8s.webgrip.nl
 
 application:
   enabled: true
@@ -20,7 +20,7 @@ application:
       containers:
         app:
           image:
-            repository: docker.io/webgrip/application-application
+            repository: docker.io/webgrip/firefly-iii-application
             tag: "latest"
             pullPolicy: Always
           securityContext:
@@ -30,7 +30,7 @@ application:
           env:
             # App
             - name: APP_NAME
-              value: application-application
+              value: firefly-iii-application
             - name: APP_ENV
               value: production
             - name: APP_DEBUG
@@ -46,7 +46,7 @@ application:
             - name: APP_KEY
               valueFrom:
                 secretKeyRef:
-                  name: application-application-secrets
+                  name: firefly-iii-application-secrets
                   key: app-key
 
             - name: DB_STRICT
@@ -64,17 +64,17 @@ application:
             - name: DB_CONNECTION
               value: mysql
             - name: DB_HOST
-              value: application-application-mariadb
+              value: firefly-iii-application-mariadb
             - name: DB_PORT
               value: "3306"
             - name: DB_DATABASE
-              value: application-application
+              value: firefly-iii-application
             - name: DB_USERNAME
-              value: application-application
+              value: firefly-iii-application
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: application-application-secrets
+                  name: firefly-iii-application-secrets
                   key: mariadb-password
 
             - name: SESSION_DRIVER
@@ -86,26 +86,26 @@ application:
             - name: REDIS_CLIENT
               value: phpredis
             - name: REDIS_PREFIX
-              value: application-application_
+              value: firefly-iii-application_
             - name: REDIS_HOST
-              value: application-application-redis-master
+              value: firefly-iii-application-redis-master
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: application-application-secrets
+                  name: firefly-iii-application-secrets
                   key: redis-password
 
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: application-application-secrets
+                  name: firefly-iii-application-secrets
                   key: api-secret
             - name: UPDATE_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: application-application-secrets
+                  name: firefly-iii-application-secrets
                   key: update-secret
           resources:
             requests:
@@ -126,8 +126,8 @@ application:
                     - >
                       php -v >/dev/null &&
                       nc -z 127.0.0.1 9000 &&
-                      nc -z application-application-mariadb 3306 &&
-                      nc -z application-application-redis-master 6379
+                      nc -z firefly-iii-application-mariadb 3306 &&
+                      nc -z firefly-iii-application-redis-master 6379
                 initialDelaySeconds: 10
                 periodSeconds: 10
 
@@ -193,7 +193,7 @@ application:
                 identifier: main
                 port: http
       tls:
-        - secretName: letsencrypt-application-application
+        - secretName: letsencrypt-firefly-iii-application
           hosts:
             - *hostname
 
@@ -229,7 +229,7 @@ application:
     nginx-conf:
       type: configMap
       enabled: true
-      name: application-application
+      name: firefly-iii-application
       advancedMounts:
         main:
           web:
@@ -307,7 +307,7 @@ redis:
   architecture: standalone
   auth:
     enabled: true
-    existingSecret: application-application-secrets
+    existingSecret: firefly-iii-application-secrets
     existingSecretPasswordKey: redis-password
   master:
     persistence:
@@ -330,9 +330,9 @@ mariadb:
     pullPolicy: IfNotPresent
   architecture: standalone
   auth:
-    existingSecret: application-application-secrets
-    database: application-application
-    username: application-application
+    existingSecret: firefly-iii-application-secrets
+    database: firefly-iii-application
+    username: firefly-iii-application
   primary:
     persistence:
       enabled: true

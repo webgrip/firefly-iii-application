@@ -1,16 +1,16 @@
 services:
-  application-application.application:
-    container_name: application-application.application
-    image: webgrip/application-application:latest
+  firefly-iii-application.application:
+    container_name: firefly-iii-application.application
+    image: webgrip/firefly-iii-application:latest
     pull_policy: never
     build:
       context: .
       dockerfile: ops/docker/application/Dockerfile
     restart: always
     depends_on:
-      application-application.mariadb:
+      firefly-iii-application.mariadb:
         condition: service_healthy
-      application-application.redis:
+      firefly-iii-application.redis:
         condition: service_healthy
     ports:
       - "127.0.0.1:9000:9000"
@@ -22,27 +22,27 @@ services:
       REQUIRE_HTTPS: "false"
     volumes:
       - ./.env:/var/www/app/.env
-      - application-application-application-public-data:/var/www/app/public
-      - application-application-application-storage-data:/var/www/app/storage
+      - firefly-iii-application-application-public-data:/var/www/app/public
+      - firefly-iii-application-application-storage-data:/var/www/app/storage
 
-  application-application.nginx:
-    container_name: application-application.nginx
-    image: webgrip/application-application-nginx:latest
+  firefly-iii-application.nginx:
+    container_name: firefly-iii-application.nginx
+    image: webgrip/firefly-iii-application-nginx:latest
     pull_policy: never
     build:
       context: .
       dockerfile: ops/docker/nginx/Dockerfile
     restart: always
     depends_on:
-      - application-application.application
+      - firefly-iii-application.application
     ports:
       - "127.0.0.1:8080:80"
     volumes:
-      - application-application-application-public-data:/var/www/app/public:ro
+      - firefly-iii-application-application-public-data:/var/www/app/public:ro
 
-  application-application.mariadb:
-    container_name: application-application.mariadb
-    image: webgrip/application-application-mariadb:latest
+  firefly-iii-application.mariadb:
+    container_name: firefly-iii-application.mariadb
+    image: webgrip/firefly-iii-application-mariadb:latest
     build:
       context: .
       dockerfile: ops/docker/mariadb/Dockerfile
@@ -63,7 +63,7 @@ services:
       MARIADB_CHARACTER_SET_SERVER: utf8mb4
       MARIADB_COLLATION_SERVER: utf8mb4_unicode_ci
     volumes:
-      - application-application-mariadb-data:/var/lib/mysql
+      - firefly-iii-application-mariadb-data:/var/lib/mysql
     healthcheck:
       test:
         [
@@ -78,16 +78,16 @@ services:
       retries: 10
       start_period: 30s
 
-  application-application.redis:
-    container_name: application-application.redis
-    image: webgrip/application-application-redis:latest
+  firefly-iii-application.redis:
+    container_name: firefly-iii-application.redis
+    image: webgrip/firefly-iii-application-redis:latest
     pull_policy: never
     build:
       context: .
       dockerfile: ops/docker/redis/Dockerfile
     restart: always
     volumes:
-      - application-application-redis-data:/data
+      - firefly-iii-application-redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -96,11 +96,11 @@ services:
       start_period: 5s
 
 volumes:
-  application-application-application-storage-data:
-  application-application-application-public-data:
+  firefly-iii-application-application-storage-data:
+  firefly-iii-application-application-public-data:
 
-  application-application-mariadb-data:
-  application-application-redis-data:
+  firefly-iii-application-mariadb-data:
+  firefly-iii-application-redis-data:
   certificate-data:
     external: true
 
