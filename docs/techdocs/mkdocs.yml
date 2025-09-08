@@ -31,7 +31,7 @@ extra_javascript:
   - javascripts/feedback.js
 
 nav:
-  - Home: index.md
+  - Home: home.md
   - Application:
       - Overview: app/overview.md
       - Lifecycle: app/lifecycle.md
@@ -62,23 +62,17 @@ nav:
           - Startup: ops/troubleshooting/startup.md
           - Connectivity: ops/troubleshooting/connectivity.md
           - Performance: ops/troubleshooting/performance.md
+  - Template Sync: template-sync.md
 
 plugins:
-  - techdocs-core:
-      use_material_search: true
-  - search:
-      min-search-length: 2
-      # prebuild_index: true
-      # indexing: full
+  - search
   - mermaid2:
       arguments:
         securityLevel: "loose"
   - macros
-  - privacy
 
 markdown_extensions:
   - markdown_inline_mermaid
-  - markdown_inline_graphviz
 
 extra:
   # analytics:
