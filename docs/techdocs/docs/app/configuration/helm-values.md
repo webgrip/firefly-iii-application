@@ -64,12 +64,19 @@ date: 2025-01-09
 - `TRUSTED_PROXIES`: ** (trust all proxies)
 - `DB_STRICT`: false
 
+**Additional Configuration:**
+- `IS_DOCKER`: true (indicates container environment)
+- `FILESYSTEM_DRIVER`: local (file storage backend)
+- `EXPANDED_LOGGING`: true (enhanced logging for troubleshooting)
+- `PDF_GENERATOR`: snappdf (PDF generation engine)
+
 **Secrets (referenced from Kubernetes secrets):**
-- `APP_KEY`: Retrieved from firefly-iii-application-secrets
-- `DB_PASSWORD`: Retrieved from firefly-iii-application-secrets
-- `REDIS_PASSWORD`: Retrieved from firefly-iii-application-secrets
-- `API_SECRET`: Retrieved from firefly-iii-application-secrets
-- `UPDATE_SECRET`: Retrieved from firefly-iii-application-secrets
+- `APP_KEY`: Application encryption key used for Laravel encryption and CSRF protection
+- `DB_PASSWORD`: Database password for MariaDB connection
+- `REDIS_PASSWORD`: Password for Redis cache and session storage
+- `API_SECRET`: Secret token for API authentication and external integrations
+- `UPDATE_SECRET`: Security token for webhook authentication and automated update notifications
+- `WEBCRON_SECRET`: Authentication token for scheduled task execution and cron job webhooks
 
 ## Sources
 - "Helm Chart Values" — ops/helm/application-application/values.yaml — retrieved 2025-01-09

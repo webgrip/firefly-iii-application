@@ -128,6 +128,51 @@ The application will be available at http://localhost:8080
 
 ---
 
+### Kubernetes (Helm)
+
+For production deployment to Kubernetes using Helm charts:
+
+#### Prerequisites
+- Kubernetes cluster with Traefik ingress controller
+- Helm 3.x installed
+- kubectl configured for your cluster
+
+#### Quick Start
+
+1. **Configure secrets** (see `ops/secrets/firefly-iii-application-secrets/values.dec.yaml.example`):
+   ```bash
+   cp ops/secrets/firefly-iii-application-secrets/values.dec.yaml.example \
+      ops/secrets/firefly-iii-application-secrets/values.dec.yaml
+   # Edit values.dec.yaml with your secrets
+   ```
+
+2. **Install secrets chart**:
+   ```bash
+   helm upgrade --install firefly-iii-application-secrets \
+     ops/secrets/firefly-iii-application-secrets \
+     --values ops/secrets/firefly-iii-application-secrets/values.dec.yaml \
+     -n firefly-iii-application --create-namespace
+   ```
+
+3. **Install main application**:
+   ```bash
+   helm upgrade --install firefly-iii-application \
+     ops/helm/firefly-iii-application \
+     -n firefly-iii-application
+   ```
+
+**Required Secrets:**
+- `app-key`: Laravel application encryption key
+- `db-password`: Database password  
+- `redis-password`: Redis password
+- `api-secret`: API authentication token
+- `update-secret`: Webhook authentication token
+- `webcron-secret`: Scheduled task authentication token
+
+For detailed documentation, see [ops/helm/README.md](ops/helm/README.md).
+
+---
+
 ## Contributing
 
 Contributions welcome! Please:
