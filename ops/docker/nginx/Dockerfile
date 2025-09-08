@@ -1,5 +1,5 @@
-# Use official nginx alpine image
-FROM nginx:alpine3.22
+# Use official nginx alpine image with exact pinned version
+FROM nginx:1.26.2-alpine3.20
 
 # Copy simple nginx configuration for Invoice Ninja FastCGI proxy
 COPY ops/docker/nginx/config/default.conf /etc/nginx/conf.d/default.conf
