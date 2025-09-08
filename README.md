@@ -9,7 +9,7 @@
 [![Dockerized](https://img.shields.io/badge/containerized-docker-2496ED?logo=docker&logoColor=white&style=flat-square)](https://www.docker.com/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/webgrip/application-template/issues)
 
-> Opinionated application template focused on repeatable quality: tested workflows, semantic releases, and automatic template drift correction.
+> Self-hosted Firefly III personal finance management application with automated deployment, security, and operational workflows.
 
 ---
 
@@ -17,6 +17,8 @@
 
 | Aspect | What You Get |
 | ------ | ------------- |
+| Application | Firefly III personal finance management |
+| Containerization | Multi-service Docker setup with org-owned images |
 | CI/CD  | GitHub Actions pipelines & template sync |
 | Consistency | Automatic sync of core config & workflow files to app repos (opt‑in via topic) |
 | Quality | Conventional Commits + Semantic Versioning scaffolding |
@@ -26,16 +28,29 @@
 
 ## Features
 
-- Automated template file synchronization (opt‑in per repo by GitHub topic)
-- Semantic release readiness (`.releaserc.json` included)
-- Encrypted secrets workflow (age / SOPS)
-- Curated GitHub workflow set (docs changes, source changes)
-- Opinionated baseline configs: EditorConfig, VSCode settings, .gitignore
-- Structured test categories (unit, integration, functional, contract, e2e, smoke, performance, behavioral)
+- **Self-maintained image policy**: All services use org-owned images built from official upstream sources
+- **Firefly III**: Complete personal finance management application stack
+- **Security-first**: Official upstream images with exact version pinning
+- **Port hygiene**: Only reverse proxy exposes host ports
+- **Automated template file synchronization** (opt‑in per repo by GitHub topic)
+- **Semantic release readiness** (`.releaserc.json` included)
+- **Encrypted secrets workflow** (age / SOPS)
+- **Curated GitHub workflow set** (docs changes, source changes)
+- **Opinionated baseline configs**: EditorConfig, VSCode settings, .gitignore
+- **Structured test categories** (unit, integration, functional, contract, e2e, smoke, performance, behavioral)
 
 ## Description
 
-Foundation repository for bootstrapping internal / external application services with consistent engineering guardrails. Replace the placeholder service specifics with your domain logic while retaining the shared operational workflows.
+Self-hosted Firefly III personal finance management application with comprehensive containerization following WebGrip's self-maintained image policy. Every service uses org-owned images built from pinned official upstream sources for enhanced security and supply chain control.
+
+**Containerization Architecture:**
+- **Application**: Firefly III core application (`fireflyiii/core:version-6.1.21`)
+- **Data Importer**: Firefly III data importer (`fireflyiii/data-importer:version-1.5.4`)
+- **Reverse Proxy**: Nginx (`nginx:1.26.2-alpine3.20`)
+- **Database**: MariaDB (`mariadb:12.0.2-noble`)
+- **Cache**: Redis (`redis:8.2.1-alpine3.20`)
+
+All images are rebuilt and tagged as `webgrip/firefly-iii-application.<service>:latest` with minimal overlays for project-specific configuration.
 
 ## Template Synchronization
 
@@ -85,10 +100,31 @@ This produces `values.sops.yaml` (commit this).
 
 ### Docker
 
+Start the full Firefly III stack:
+
 ```bash
-docker compose up --build
-docker compose down --remove-orphans --volumes
+make start
 ```
+
+Stop and clean up:
+
+```bash
+make stop
+```
+
+The application will be available at http://localhost:8080
+
+**Services:**
+- **Nginx**: Reverse proxy exposing the application (port 8080)
+- **Firefly III Application**: Personal finance management application
+- **Firefly III Data Importer**: Data import and synchronization service
+- **MariaDB**: Database backend
+- **Redis**: Cache and session storage
+
+**Port Policy:**
+- Only the nginx reverse proxy exposes host ports (8080)
+- Internal application services communicate via Docker network
+- Database and Redis are only accessible within the container network
 
 ---
 

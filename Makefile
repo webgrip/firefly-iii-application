@@ -8,8 +8,8 @@
 SHELL := /usr/bin/bash
 .ONESHELL:
 .DEFAULT_GOAL := help
-#   make expose NAMESPACE=invoiceninja-application SERVICE_NAME=invoiceninja-application REMOTE_PORT=80
-APP_NAME      ?= invoiceninja-application
+#   make expose NAMESPACE=firefly-iii-application SERVICE_NAME=firefly-iii-application REMOTE_PORT=80
+APP_NAME      ?= firefly-iii-application
 NAMESPACE     ?= $(APP_NAME)
 SERVICE_NAME  ?= $(APP_NAME)
 APP_SERVICE   ?= $(APP_NAME).application
@@ -403,13 +403,13 @@ wait-ready:  ## Poll a URL until HTTP 200 (URL=...)
 
 # --- App bootstrap -----------------------------------------------------------
 
-## Create an admin user (EMAIL, PASS envs optional; customize command for your app)
+## Create a Firefly III admin user (EMAIL, PASS envs optional)
 user\:create: ## Create user (override EMAIL=user@example.com PASS=pass)
 	@$(call _req_cmd,$(word 1,$(COMPOSE)))
 	: $${EMAIL:=admin@example.com}; \
 	: $${PASS:=password}; \
-	printf "$(C_INFO)Creating user %s...$(C_RESET)\n" "$$EMAIL"; \
-	$(COMPOSE) exec $(APP_SERVICE) php artisan ninja:create-account --email="$$EMAIL" --password="$$PASS"; \
+	printf "$(C_INFO)Creating Firefly III user %s...$(C_RESET)\n" "$$EMAIL"; \
+	$(COMPOSE) exec $(APP_SERVICE) php artisan firefly-iii:create-user --email="$$EMAIL" --password="$$PASS"; \
 	printf "$(C_OK)User creation complete.$(C_RESET)\n"
 
 # --- Phony list ---------------------------------------------------------------
