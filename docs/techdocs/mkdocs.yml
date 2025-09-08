@@ -1,5 +1,5 @@
-site_name: "firefly-iii-application TechDocs"
-site_description: ""
+site_name: "Invoice Ninja Application Documentation"
+site_description: "Comprehensive documentation for the containerized Invoice Ninja deployment"
 
 theme:
   name: "material"
@@ -28,6 +28,27 @@ extra_javascript:
 
 nav:
   - Home: index.md
+  - Application:
+    - Overview: app/overview.md
+    - Lifecycle & Support: app/lifecycle.md
+    - Configuration:
+      - Environment Variables: app/configuration/env.md
+      - Files & Paths: app/configuration/files-and-paths.md
+      - Entrypoint & CLI: app/configuration/entrypoint-cli.md
+      - Helm Values: app/configuration/helm-values.md
+  - Integrations:
+    - Database: integrations/database.md
+    - Cache: integrations/cache.md
+    - Mailer: integrations/mailer.md
+  - Operations:
+    - Runbook: ops/runbook.md
+    - Networking: ops/networking.md
+    - Observability: ops/observability.md
+    - Upgrades & Rollback: ops/upgrades-rollback.md
+    - Troubleshooting:
+      - Startup Issues: ops/troubleshooting/startup.md
+      - Connectivity: ops/troubleshooting/connectivity.md
+      - Performance: ops/troubleshooting/performance.md
   - Template Sync: template-sync.md
 
 # https://www.mkdocs.org/user-guide/configuration
