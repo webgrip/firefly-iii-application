@@ -123,7 +123,7 @@ docker compose start firefly-iii-application.application
 **Container health verification:**
 ```bash
 # Check all container health status
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+docker ps --format "table {{ '{' }}.Names{{ '}' }}\t{{ '{' }}.Status{{ '}' }}\t{{ '{' }}.Ports{{ '}' }}"
 
 # Detailed health check
 docker inspect firefly-iii-application.application | grep -A 5 Health

@@ -20,3 +20,6 @@ yarn-error.log*
 coverage/
 dist/
 build/
+
+# MkDocs
+docs/techdocs/site/

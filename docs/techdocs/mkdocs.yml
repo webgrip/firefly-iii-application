@@ -72,7 +72,8 @@ plugins:
   - macros
 
 markdown_extensions:
-  - markdown_inline_mermaid
+  - attr_list
+  - md_in_html
 
 extra:
   # analytics:
