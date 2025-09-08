@@ -24,10 +24,11 @@ date: 2025-01-09
 
 ## Quickstart
 ```bash
-make bootstrap   # pin/pull images, copy .env.example -> .env
-make start       # start services; wait for healthchecks to pass
-make logs        # tail logs
-make stop        # stop services
+# First time setup
+cp .env.example .env  # copy environment template
+make start            # start services; wait for healthchecks to pass
+make logs             # tail logs
+make stop             # stop services
 ```
 
 ## Verification
