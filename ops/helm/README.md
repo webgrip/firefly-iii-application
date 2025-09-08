@@ -7,7 +7,7 @@ This directory contains Helm charts for deploying the Firefly III personal finan
 ### Main Application Chart
 - **Location**: `firefly-iii-application/`
 - **Purpose**: Deploys the complete Firefly III application stack
-- **Dependencies**: Uses `bjw-s/app-template` v4.2.0 with optional Redis and MariaDB
+- **Dependencies**: Uses official `firefly-iii/firefly-iii` v1.9.11 chart with optional Redis and MariaDB
 
 ### Secrets Chart
 - **Location**: `../secrets/firefly-iii-application-secrets/`
@@ -133,7 +133,7 @@ The chart uses these Helm chart dependencies:
 
 | Chart | Version | Repository | Purpose |
 |-------|---------|------------|---------|
-| `bjw-s/app-template` | 4.2.0 | https://bjw-s-labs.github.io/helm-charts | Main application deployment |
+| `firefly-iii/firefly-iii` | 1.9.11 | https://firefly-iii.github.io/kubernetes | Official Firefly III application |
 | `bitnami/redis` | 22.0.7 | https://charts.bitnami.com/bitnami | Cache and session storage |
 | `bitnami/mariadb` | 22.0.0 | https://charts.bitnami.com/bitnami | Database backend |
 
@@ -157,8 +157,8 @@ The application requires persistent storage for:
 
 The application includes:
 
-- **Readiness probe**: HTTP check on `/` (port 8080)
-- **Liveness probe**: HTTP check on `/` (port 8080)
+- **Readiness probe**: HTTP check on `/health` (port 80)
+- **Liveness probe**: HTTP check on `/health` (port 80)
 - **Resource limits**: CPU and memory constraints
 
 ## Troubleshooting

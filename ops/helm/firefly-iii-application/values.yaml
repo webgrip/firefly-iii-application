@@ -4,185 +4,160 @@ _shared_config:
   hostname: &hostname firefly-iii-application.staging.k8s.webgrip.nl
   url: &url https://firefly-iii-application.staging.k8s.webgrip.nl
 
-application:
+# Official Firefly III chart configuration
+firefly-iii:
   enabled: true
-
-  controllers:
-    main:
-      pod:
-        securityContext:
-          runAsNonRoot: true
-          seccompProfile:
-            type: RuntimeDefault
-          fsGroup: 1500
-          fsGroupChangePolicy: OnRootMismatch
-
-      containers:
-        app:
-          image:
-            repository: webgrip/firefly-iii-application
-            tag: "latest"
-            pullPolicy: Always
-          securityContext:
-            runAsUser: 1500
-            runAsGroup: 1500
-            allowPrivilegeEscalation: false
-          ports:
-            - name: http
-              containerPort: 8080
-          env:
-            # App
-            - name: APP_NAME
-              value: firefly-iii-application
-            - name: APP_ENV
-              value: production
-            - name: APP_DEBUG
-              value: "false"
-            - name: APP_URL
-              value: *url
-            - name: APP_LOCALE
-              value: en
-            - name: APP_FALLBACK_LOCALE
-              value: en
-            - name: APP_TIMEZONE
-              value: Europe/Amsterdam
-            - name: APP_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: firefly-iii-application-secrets
-                  key: app-key
-
-            - name: DB_STRICT
-              value: "false"
-            - name: REQUIRE_HTTPS
-              value: "true"
-            - name: TRUSTED_PROXIES
-              value: "**"
-
-            - name: LOG_CHANNEL
-              value: stderr
-            - name: LOG_LEVEL
-              value: info
-
-            - name: DB_CONNECTION
-              value: mysql
-            - name: DB_HOST
-              value: firefly-iii-application-mariadb
-            - name: DB_PORT
-              value: "3306"
-            - name: DB_DATABASE
-              value: firefly-iii-application
-            - name: DB_USERNAME
-              value: firefly-iii-application
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: firefly-iii-application-secrets
-                  key: mariadb-password
-
-            - name: SESSION_DRIVER
-              value: redis
-            - name: CACHE_DRIVER
-              value: redis
-            - name: QUEUE_CONNECTION
-              value: redis
-            - name: REDIS_CLIENT
-              value: phpredis
-            - name: REDIS_PREFIX
-              value: firefly-iii-application_
-            - name: REDIS_HOST
-              value: firefly-iii-application-redis-master
-            - name: REDIS_PORT
-              value: "6379"
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: firefly-iii-application-secrets
-                  key: redis-password
-
-            - name: API_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: firefly-iii-application-secrets
-                  key: api-secret
-            - name: UPDATE_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: firefly-iii-application-secrets
-                  key: update-secret
-            - name: WEBCRON_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: firefly-iii-application-secrets
-                  key: webcron-secret
-
-            # Additional Firefly III configuration
-            - name: IS_DOCKER
-              value: "true"
-            - name: FILESYSTEM_DRIVER
-              value: local
-            - name: EXPANDED_LOGGING
-              value: "true"
-            - name: PDF_GENERATOR
-              value: snappdf
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "512Mi"
-            limits:
-              cpu: "1000m"
-              memory: "1Gi"
-          probes:
-            readiness:
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /
-                  port: 8080
-                initialDelaySeconds: 10
-                periodSeconds: 10
-            liveness:
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /
-                  port: 8080
-                initialDelaySeconds: 30
-                periodSeconds: 30
-
-
-
+  
+  # Use our custom image
+  image:
+    registry: "docker.io"
+    repository: "webgrip/firefly-iii-application"
+    tag: "latest"
+    pullPolicy: Always
+  
+  # Security context
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    fsGroup: 1500
+    fsGroupChangePolicy: OnRootMismatch
+  
+  securityContext:
+    runAsUser: 1500
+    runAsGroup: 1500
+    allowPrivilegeEscalation: false
+  
+  # Resource limits
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  
+  # Persistent storage for uploads
   persistence:
-    uploads:
-      enabled: true
-      type: persistentVolumeClaim
-      size: 10Gi
-      retain: true
-      globalMounts:
-        - path: /var/www/html/storage/upload
-
+    enabled: true
+    size: 10Gi
+    retain: true
+  
+  # Application configuration using existing secrets
+  config:
+    existingSecret: firefly-iii-application-secrets
+    
+    # Non-secret environment variables
+    env:
+      # App configuration
+      APP_NAME: firefly-iii-application
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: *url
+      APP_LOCALE: en
+      APP_FALLBACK_LOCALE: en
+      APP_TIMEZONE: Europe/Amsterdam
+      
+      # Database configuration
+      DB_STRICT: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: firefly-iii-application-mariadb
+      DB_PORT: "3306"
+      DB_DATABASE: firefly-iii-application
+      DB_USERNAME: firefly-iii-application
+      
+      # Security
+      REQUIRE_HTTPS: "true"
+      TRUSTED_PROXIES: "**"
+      
+      # Logging
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: info
+      
+      # Redis configuration
+      SESSION_DRIVER: redis
+      CACHE_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      REDIS_CLIENT: phpredis
+      REDIS_PREFIX: firefly-iii-application_
+      REDIS_HOST: firefly-iii-application-redis-master
+      REDIS_PORT: "6379"
+      
+      # Additional Firefly III configuration
+      IS_DOCKER: "true"
+      FILESYSTEM_DRIVER: local
+      EXPANDED_LOGGING: "true"
+      PDF_GENERATOR: snappdf
+    
+    # Secret environment variables from existing secret
+    envValueFrom:
+      APP_KEY:
+        secretKeyRef:
+          name: firefly-iii-application-secrets
+          key: app-key
+      DB_PASSWORD:
+        secretKeyRef:
+          name: firefly-iii-application-secrets
+          key: mariadb-password
+      REDIS_PASSWORD:
+        secretKeyRef:
+          name: firefly-iii-application-secrets
+          key: redis-password
+      API_SECRET:
+        secretKeyRef:
+          name: firefly-iii-application-secrets
+          key: api-secret
+      UPDATE_SECRET:
+        secretKeyRef:
+          name: firefly-iii-application-secrets
+          key: update-secret
+      WEBCRON_SECRET:
+        secretKeyRef:
+          name: firefly-iii-application-secrets
+          key: webcron-secret
+  
+  # Service configuration
   service:
-    main:
-      ports:
-        http:
-          port: 8080
-
+    type: ClusterIP
+    port: 80
+  
+  # Ingress configuration for Traefik
   ingress:
-    main:
-      enabled: true
-      className: traefik
-      annotations:
-        traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd
-      hosts:
-        - host: *hostname
-          paths:
-            - path: /
-              service:
-                name: main
-                port: http
+    enabled: true
+    className: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd
+    hosts:
+      - host: *hostname
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+  
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 30
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  
+  startupProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 30
 
+# Redis configuration
 redis:
   enabled: true
   architecture: standalone
@@ -197,6 +172,7 @@ redis:
   replica:
     replicaCount: 0
 
+# MariaDB configuration
 mariadb:
   enabled: true
   auth:

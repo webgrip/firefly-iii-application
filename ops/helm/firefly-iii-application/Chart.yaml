@@ -1,14 +1,14 @@
 apiVersion: v2
 name: firefly-iii-application
-description: "Helm Chart for deploying firefly-iii-application on Kubernetes"
+description: "Helm Chart for deploying firefly-iii-application on Kubernetes using official Firefly III charts"
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
 dependencies:
-  - name: app-template
-    repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.2.0
-    alias: application
+  - name: firefly-iii
+    repository: https://firefly-iii.github.io/kubernetes
+    version: 1.9.11
+    alias: firefly-iii
   - name: redis
     repository: https://charts.bitnami.com/bitnami
     version: 22.0.7
