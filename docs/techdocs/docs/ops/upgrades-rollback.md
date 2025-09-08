@@ -272,7 +272,7 @@ RESPONSE_TIME=$(curl -o /dev/null -s -w '%{time_total}' http://localhost:8080/)
 echo "Response time: ${RESPONSE_TIME}s"
 
 # Memory usage check
-MEMORY_USAGE=$(docker stats --no-stream --format "{{.MemUsage}}" firefly-iii-application.application)
+MEMORY_USAGE=$(docker stats --no-stream --format "{{ '{' }}.MemUsage{{ '}' }}" firefly-iii-application.application)
 echo "Memory usage: ${MEMORY_USAGE}"
 
 # Database performance check

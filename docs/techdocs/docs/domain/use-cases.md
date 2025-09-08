@@ -3,7 +3,7 @@ title: "Use Cases"
 description: "Application service orchestration and business workflow coordination."
 tags: [ddd, use-cases, application-services]
 search: { boost: 2, exclude: false }
-icon: material/workflow
+icon: material/cog
 author: "<Infrastructure/Platform Team>"
 date: 2025-01-09
 ---

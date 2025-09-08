@@ -3,7 +3,7 @@ title: "Helm — Used Values"
 description: "Only the values from values.yaml that this repo actually uses."
 tags: [helm, configuration]
 search: { boost: 2, exclude: false }
-icon: material/helm
+icon: material/ship-wheel
 author: "<Infrastructure/Platform Team>"
 date: 2025-01-09
 ---

@@ -212,7 +212,7 @@ curl -I http://localhost:8080/ | grep -i location
 **Startup Sequence Debug:**
 ```bash
 # Monitor startup sequence
-watch -n 2 'docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+watch -n 2 'docker ps --format "table {{ '{' }}.Names{{ '}' }}\t{{ '{' }}.Status{{ '}' }}\t{{ '{' }}.Ports{{ '}' }}"'
 
 # Check dependency order
 docker compose config | grep -A 5 depends_on
