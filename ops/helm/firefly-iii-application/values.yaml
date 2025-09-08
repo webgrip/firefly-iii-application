@@ -204,6 +204,8 @@ mariadb:
     database: firefly-iii-application
     username: firefly-iii-application
     existingSecret: firefly-iii-application-secrets
+    existingSecretPasswordKey: mariadb-password
+    existingSecretRootPasswordKey: mariadb-root-password
   primary:
     persistence:
       enabled: true
