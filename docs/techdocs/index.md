@@ -11,10 +11,10 @@ date: 2025-01-09
 **Purpose:** Entry point for deeper Firefly III documentation.
 
 **Contents**
-- [Application](app/overview.md)
-- [Domain (DDD)](domain/ubiquitous-language.md)
-- [Operations](ops/runbook.md)
-- [Troubleshooting](ops/troubleshooting/startup.md)
+- [Application](app/overview/)
+- [Domain (DDD)](domain/ubiquitous-language/)
+- [Operations](ops/runbook/)
+- [Troubleshooting](ops/troubleshooting/startup/)
 - [Sources](#sources)
 
 ## Application

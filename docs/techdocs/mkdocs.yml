@@ -1,6 +1,9 @@
 site_name: "firefly-iii-application TechDocs"
 site_description: "Documentation for operating and evolving Firefly III in this repository."
 
+site_url: "https://webgrip.github.io/firefly-iii-application/"
+use_directory_urls: true
+
 theme:
   name: "material"
   custom_dir: overrides
