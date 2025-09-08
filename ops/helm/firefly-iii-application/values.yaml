@@ -27,6 +27,9 @@ application:
             runAsUser: 1500
             runAsGroup: 1500
             allowPrivilegeEscalation: false
+          ports:
+            - name: http
+              containerPort: 8080
           env:
             # App
             - name: APP_NAME
@@ -119,80 +122,22 @@ application:
               enabled: true
               custom: true
               spec:
-                exec:
-                  command:
-                    - sh
-                    - -lc
-                    - >
-                      php -v >/dev/null &&
-                      nc -z 127.0.0.1 9000 &&
-                      nc -z firefly-iii-application-mariadb 3306 &&
-                      nc -z firefly-iii-application-redis-master 6379
+                httpGet:
+                  path: /
+                  port: 8080
                 initialDelaySeconds: 10
                 periodSeconds: 10
-
-        web:
-          image:
-            repository: nginxinc/nginx-unprivileged
-            tag: 1.29.1-alpine3.22-perl
-          securityContext:
-            runAsUser: 101
-            runAsGroup: 101
-            readOnlyRootFilesystem: true
-            allowPrivilegeEscalation: false
-          ports:
-            - name: http
-              containerPort: 8080
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "200m"
-              memory: "256Mi"
-          probes:
-            readiness:
+            liveness:
               enabled: true
               custom: true
               spec:
                 httpGet:
                   path: /
                   port: 8080
-                initialDelaySeconds: 5
-                periodSeconds: 5
+                initialDelaySeconds: 30
+                periodSeconds: 30
 
-  configMaps:
-    nginx-config:
-      enabled: true
-      data:
-        default.conf: |
-          upstream php-fpm {
-              server 127.0.0.1:9000;
-          }
 
-          server {
-              listen 8080 default_server;
-              server_name _;
-              root /var/www/html/public;
-              index index.php index.html;
-              client_max_body_size 100M;
-
-              location / {
-                  try_files $uri $uri/ /index.php?$query_string;
-              }
-
-              location ~ \.php$ {
-                  include fastcgi_params;
-                  fastcgi_pass php-fpm;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  fastcgi_index index.php;
-                  fastcgi_read_timeout 300;
-              }
-
-              location ~ /\.ht {
-                  deny all;
-              }
-          }
 
   persistence:
     uploads:
@@ -212,10 +157,9 @@ application:
   ingress:
     main:
       enabled: true
-      className: nginx
+      className: traefik
       annotations:
-        nginx.ingress.kubernetes.io/proxy-body-size: "100m"
-        nginx.ingress.kubernetes.io/client-max-body-size: "100m"
+        traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd
       hosts:
         - host: *hostname
           paths:
