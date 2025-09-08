@@ -936,12 +936,18 @@
 - <code>REQUIRE_HTTPS</code>: true
 - <code>TRUSTED_PROXIES</code>: ** (trust all proxies)
 - <code>DB_STRICT</code>: false</p>
+<p><strong>Additional Configuration:</strong>
+- <code>IS_DOCKER</code>: true (indicates container environment)
+- <code>FILESYSTEM_DRIVER</code>: local (file storage backend)
+- <code>EXPANDED_LOGGING</code>: true (enhanced logging for troubleshooting)
+- <code>PDF_GENERATOR</code>: snappdf (PDF generation engine)</p>
 <p><strong>Secrets (referenced from Kubernetes secrets):</strong>
-- <code>APP_KEY</code>: Retrieved from firefly-iii-application-secrets
-- <code>DB_PASSWORD</code>: Retrieved from firefly-iii-application-secrets
-- <code>REDIS_PASSWORD</code>: Retrieved from firefly-iii-application-secrets
-- <code>API_SECRET</code>: Retrieved from firefly-iii-application-secrets
-- <code>UPDATE_SECRET</code>: Retrieved from firefly-iii-application-secrets</p>
+- <code>APP_KEY</code>: Application encryption key used for Laravel encryption and CSRF protection
+- <code>DB_PASSWORD</code>: Database password for MariaDB connection
+- <code>REDIS_PASSWORD</code>: Password for Redis cache and session storage
+- <code>API_SECRET</code>: Secret token for API authentication and external integrations
+- <code>UPDATE_SECRET</code>: Security token for webhook authentication and automated update notifications
+- <code>WEBCRON_SECRET</code>: Authentication token for scheduled task execution and cron job webhooks</p>
 <h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
 <ul>
 <li>"Helm Chart Values" — ops/helm/application-application/values.yaml — retrieved 2025-01-09</li>
