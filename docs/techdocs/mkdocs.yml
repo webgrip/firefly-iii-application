@@ -1,5 +1,5 @@
 site_name: "firefly-iii-application TechDocs"
-site_description: ""
+site_description: "Documentation for operating and evolving Firefly III in this repository."
 
 theme:
   name: "material"
@@ -28,10 +28,40 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - Template Sync: template-sync.md
+  - Application:
+      - Overview: app/overview.md
+      - Lifecycle: app/lifecycle.md
+      - Configuration:
+          - Environment: app/configuration/env.md
+          - Files & Paths: app/configuration/files-and-paths.md
+          - Entrypoint & CLI: app/configuration/entrypoint-cli.md
+          - Helm (used values): app/configuration/helm-values.md
+      - Integrations:
+          - Database: app/integrations/database.md
+          - Cache: app/integrations/cache.md
+          - Mailer: app/integrations/mailer.md
+  - Domain (DDD):
+      - Ubiquitous Language: domain/ubiquitous-language.md
+      - Bounded Contexts: domain/bounded-contexts.md
+      - Aggregates & Invariants: domain/aggregates.md
+      - Domain Events: domain/domain-events.md
+      - Context Map: domain/context-map.md
+      - Anti-Corruption Layer: domain/anti-corruption-layer.md
+      - Repositories & Adapters: domain/repositories-and-adapters.md
+      - Use Cases: domain/use-cases.md
+  - Operations:
+      - Runbook: ops/runbook.md
+      - Networking: ops/networking.md
+      - Observability: ops/observability.md
+      - Upgrades & Rollback: ops/upgrades-rollback.md
+      - Troubleshooting:
+          - Startup: ops/troubleshooting/startup.md
+          - Connectivity: ops/troubleshooting/connectivity.md
+          - Performance: ops/troubleshooting/performance.md
 
 # https://www.mkdocs.org/user-guide/configuration
 plugins:
+  - search
   - techdocs-core:
       use_material_search: true
   - search:
