@@ -3,6 +3,7 @@ site_description: "Documentation for operating and evolving Firefly III in this 
 
 site_url: "https://webgrip.github.io/firefly-iii-application/"
 use_directory_urls: true
+docs_dir: .
 
 theme:
   name: "material"
@@ -64,7 +65,6 @@ nav:
 
 # https://www.mkdocs.org/user-guide/configuration
 plugins:
-  - search
   - techdocs-core:
       use_material_search: true
   - search:
