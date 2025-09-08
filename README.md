@@ -45,6 +45,7 @@ Self-hosted Firefly III personal finance management application with comprehensi
 
 **Containerization Architecture:**
 - **Application**: Firefly III core application (`fireflyiii/core:version-6.1.21`)
+- **Data Importer**: Firefly III data importer (`fireflyiii/data-importer:version-1.5.4`)
 - **Reverse Proxy**: Nginx (`nginx:1.26.2-alpine3.20`)
 - **Database**: MariaDB (`mariadb:12.0.2-noble`)
 - **Cache**: Redis (`redis:8.2.1-alpine3.20`)
@@ -116,6 +117,7 @@ The application will be available at http://localhost:8080
 **Services:**
 - **Nginx**: Reverse proxy exposing the application (port 8080)
 - **Firefly III Application**: Personal finance management application
+- **Firefly III Data Importer**: Data import and synchronization service
 - **MariaDB**: Database backend
 - **Redis**: Cache and session storage
 
