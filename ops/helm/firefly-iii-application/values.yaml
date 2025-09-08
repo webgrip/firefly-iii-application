@@ -1,0 +1,251 @@
+namespace: firefly-iii-application
+
+_shared_config:
+  hostname: &hostname firefly-iii-application.staging.k8s.webgrip.nl
+  url: &url https://firefly-iii-application.staging.k8s.webgrip.nl
+
+application:
+  enabled: true
+
+  controllers:
+    main:
+      pod:
+        securityContext:
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+          fsGroup: 1500
+          fsGroupChangePolicy: OnRootMismatch
+
+      containers:
+        app:
+          image:
+            repository: webgrip/firefly-iii-application
+            tag: "latest"
+            pullPolicy: Always
+          securityContext:
+            runAsUser: 1500
+            runAsGroup: 1500
+            allowPrivilegeEscalation: false
+          env:
+            # App
+            - name: APP_NAME
+              value: firefly-iii-application
+            - name: APP_ENV
+              value: production
+            - name: APP_DEBUG
+              value: "false"
+            - name: APP_URL
+              value: *url
+            - name: APP_LOCALE
+              value: en
+            - name: APP_FALLBACK_LOCALE
+              value: en
+            - name: APP_TIMEZONE
+              value: Europe/Amsterdam
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-application-secrets
+                  key: app-key
+
+            - name: DB_STRICT
+              value: "false"
+            - name: REQUIRE_HTTPS
+              value: "true"
+            - name: TRUSTED_PROXIES
+              value: "**"
+
+            - name: LOG_CHANNEL
+              value: stderr
+            - name: LOG_LEVEL
+              value: info
+
+            - name: DB_CONNECTION
+              value: mysql
+            - name: DB_HOST
+              value: firefly-iii-application-mariadb
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_DATABASE
+              value: firefly-iii-application
+            - name: DB_USERNAME
+              value: firefly-iii-application
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-application-secrets
+                  key: mariadb-password
+
+            - name: SESSION_DRIVER
+              value: redis
+            - name: CACHE_DRIVER
+              value: redis
+            - name: QUEUE_CONNECTION
+              value: redis
+            - name: REDIS_CLIENT
+              value: phpredis
+            - name: REDIS_PREFIX
+              value: firefly-iii-application_
+            - name: REDIS_HOST
+              value: firefly-iii-application-redis-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-application-secrets
+                  key: redis-password
+
+            - name: API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-application-secrets
+                  key: api-secret
+            - name: UPDATE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: firefly-iii-application-secrets
+                  key: update-secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          probes:
+            readiness:
+              enabled: true
+              custom: true
+              spec:
+                exec:
+                  command:
+                    - sh
+                    - -lc
+                    - >
+                      php -v >/dev/null &&
+                      nc -z 127.0.0.1 9000 &&
+                      nc -z firefly-iii-application-mariadb 3306 &&
+                      nc -z firefly-iii-application-redis-master 6379
+                initialDelaySeconds: 10
+                periodSeconds: 10
+
+        web:
+          image:
+            repository: nginxinc/nginx-unprivileged
+            tag: 1.29.1-alpine3.22-perl
+          securityContext:
+            runAsUser: 101
+            runAsGroup: 101
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+          probes:
+            readiness:
+              enabled: true
+              custom: true
+              spec:
+                httpGet:
+                  path: /
+                  port: 8080
+                initialDelaySeconds: 5
+                periodSeconds: 5
+
+  configMaps:
+    nginx-config:
+      enabled: true
+      data:
+        default.conf: |
+          upstream php-fpm {
+              server 127.0.0.1:9000;
+          }
+
+          server {
+              listen 8080 default_server;
+              server_name _;
+              root /var/www/html/public;
+              index index.php index.html;
+              client_max_body_size 100M;
+
+              location / {
+                  try_files $uri $uri/ /index.php?$query_string;
+              }
+
+              location ~ \.php$ {
+                  include fastcgi_params;
+                  fastcgi_pass php-fpm;
+                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                  fastcgi_index index.php;
+                  fastcgi_read_timeout 300;
+              }
+
+              location ~ /\.ht {
+                  deny all;
+              }
+          }
+
+  persistence:
+    uploads:
+      enabled: true
+      type: persistentVolumeClaim
+      size: 10Gi
+      retain: true
+      globalMounts:
+        - path: /var/www/html/storage/upload
+
+  service:
+    main:
+      ports:
+        http:
+          port: 8080
+
+  ingress:
+    main:
+      enabled: true
+      className: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+        nginx.ingress.kubernetes.io/client-max-body-size: "100m"
+      hosts:
+        - host: *hostname
+          paths:
+            - path: /
+              service:
+                name: main
+                port: http
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: true
+    existingSecret: firefly-iii-application-secrets
+    existingSecretPasswordKey: redis-password
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+  replica:
+    replicaCount: 0
+
+mariadb:
+  enabled: true
+  auth:
+    rootPassword: ""
+    database: firefly-iii-application
+    username: firefly-iii-application
+    existingSecret: firefly-iii-application-secrets
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
