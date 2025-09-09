@@ -7,14 +7,14 @@ _shared_config:
 # Official Firefly III chart configuration
 firefly-iii:
   enabled: true
-  
+
   # Use our custom image
   image:
     registry: "docker.io"
     repository: "webgrip/firefly-iii-application"
     tag: "latest"
     pullPolicy: Always
-  
+
   # Security context
   podSecurityContext:
     runAsNonRoot: true
@@ -22,12 +22,12 @@ firefly-iii:
       type: RuntimeDefault
     fsGroup: 1500
     fsGroupChangePolicy: OnRootMismatch
-  
+
   securityContext:
     runAsUser: 1500
     runAsGroup: 1500
     allowPrivilegeEscalation: false
-  
+
   # Resource limits
   resources:
     requests:
@@ -36,17 +36,17 @@ firefly-iii:
     limits:
       cpu: "1000m"
       memory: "1Gi"
-  
+
   # Persistent storage for uploads
   persistence:
     enabled: true
     size: 10Gi
     retain: true
-  
+
   # Application configuration using existing secrets
   config:
     existingSecret: firefly-iii-application-secrets
-    
+
     # Non-secret environment variables
     env:
       # App configuration
@@ -57,7 +57,7 @@ firefly-iii:
       APP_LOCALE: en
       APP_FALLBACK_LOCALE: en
       APP_TIMEZONE: Europe/Amsterdam
-      
+
       # Database configuration
       DB_STRICT: "false"
       DB_CONNECTION: mysql
@@ -65,15 +65,15 @@ firefly-iii:
       DB_PORT: "3306"
       DB_DATABASE: firefly-iii-application
       DB_USERNAME: firefly-iii-application
-      
+
       # Security
       REQUIRE_HTTPS: "true"
       TRUSTED_PROXIES: "**"
-      
+
       # Logging
       LOG_CHANNEL: stderr
       LOG_LEVEL: info
-      
+
       # Redis configuration
       SESSION_DRIVER: redis
       CACHE_DRIVER: redis
@@ -82,13 +82,13 @@ firefly-iii:
       REDIS_PREFIX: firefly-iii-application_
       REDIS_HOST: firefly-iii-application-redis-master
       REDIS_PORT: "6379"
-      
+
       # Additional Firefly III configuration
       IS_DOCKER: "true"
       FILESYSTEM_DRIVER: local
       EXPANDED_LOGGING: "true"
       PDF_GENERATOR: snappdf
-    
+
     # Secret environment variables from existing secret
     envValueFrom:
       APP_KEY:
@@ -115,25 +115,28 @@ firefly-iii:
         secretKeyRef:
           name: firefly-iii-application-secrets
           key: webcron-secret
-  
+
   # Service configuration
   service:
     type: ClusterIP
     port: 80
-  
+
   # Ingress configuration for Traefik
   ingress:
     enabled: true
     className: traefik
     annotations:
-      traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd
+      traefik.ingress.kubernetes.io/router.middlewares: ingress-traefik-ryan-home-ip-allow-list@kubernetescrd
     hosts:
       - host: *hostname
         paths:
           - path: /
             pathType: Prefix
-    tls: []
-  
+    tls:
+      - secretName: letsencrypt-firefly-iii-application
+        hosts:
+          - *hostname
+
   # Health checks
   livenessProbe:
     httpGet:
@@ -141,14 +144,14 @@ firefly-iii:
       port: http
     initialDelaySeconds: 30
     periodSeconds: 30
-  
+
   readinessProbe:
     httpGet:
       path: /health
       port: http
     initialDelaySeconds: 10
     periodSeconds: 10
-  
+
   startupProbe:
     httpGet:
       path: /health
@@ -168,7 +171,7 @@ redis:
   primary:
     persistence:
       enabled: true
-      size: 8Gi
+      size: 2Gi
   replica:
     replicaCount: 0
 
@@ -185,4 +188,4 @@ mariadb:
   primary:
     persistence:
       enabled: true
-      size: 20Gi
+      size: 5Gi

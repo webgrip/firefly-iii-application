@@ -12,8 +12,8 @@ services:
         condition: service_healthy
       firefly-iii-application.redis:
         condition: service_healthy
-    expose:
-      - "8080"
+    ports:
+      - "127.0.0.1:8080:8080"
     env_file: ./.env
     environment:
       DB_TYPE: ${DB_CONNECTION:-}
@@ -31,26 +31,28 @@ services:
       retries: 3
       start_period: 60s
 
-  firefly-iii-application.nginx:
-    container_name: firefly-iii-application.nginx
-    image: webgrip/firefly-iii-application.nginx:latest
+  firefly-iii-application.data-importer:
+    container_name: firefly-iii-application.data-importer
+    image: webgrip/firefly-iii-application.data-importer:latest
     pull_policy: never
     build:
       context: .
-      dockerfile: ops/docker/nginx/Dockerfile
+      dockerfile: ops/docker/data-importer/Dockerfile
     restart: always
     depends_on:
-      - firefly-iii-application.application
+      firefly-iii-application.application:
+        condition: service_healthy
     ports:
-      - "127.0.0.1:8080:80"
+      - "127.0.0.1:8081:8080"
+    env_file: ./.env.importer
     volumes:
-      - firefly-iii-application-application-public-data:/var/www/app/public:ro
+      - firefly-iii-application-data-importer-storage:/var/www/app/storage
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s
-      timeout: 3s
+      timeout: 10s
       retries: 3
-      start_period: 5s
+      start_period: 60s
 
   firefly-iii-application.mariadb:
     container_name: firefly-iii-application.mariadb
@@ -108,33 +110,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
-
-  firefly-iii-application.data-importer:
-    container_name: firefly-iii-application.data-importer
-    image: webgrip/firefly-iii-application.data-importer:latest
-    pull_policy: never
-    build:
-      context: .
-      dockerfile: ops/docker/data-importer/Dockerfile
-    restart: always
-    depends_on:
-      firefly-iii-application.application:
-        condition: service_healthy
-    expose:
-      - "8080"
-    env_file: ./.env
-    environment:
-      FIREFLY_III_URL: http://firefly-iii-application.application:8080
-      FIREFLY_III_ACCESS_TOKEN: ${FIREFLY_III_ACCESS_TOKEN:-}
-      LOG_CHANNEL: stack
-    volumes:
-      - firefly-iii-application-data-importer-storage:/var/www/app/storage
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
 volumes:
   firefly-iii-application-application-storage-data:

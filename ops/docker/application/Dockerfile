@@ -1,13 +1,11 @@
-# Use official Firefly III image with exact version tag
-FROM fireflyiii/core:version-6.1.21
+ARG FIREFLY_VERSION=6.3.2
+FROM fireflyiii/core:version-${FIREFLY_VERSION}
 
-# Minimal overlay for project-specific configuration
-# The base image already contains all necessary components for Firefly III
-# Including PHP-FPM, Laravel application, and required extensions
+SHELL ["/bin/sh", "-euxo", "pipefail"]
 
-# Health check to ensure the application is running
-HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:8080/ || exit 1
+COPY ./ops/docker/application/php.ini /usr/local/etc/php/conf.d/zz-custom.ini
 
-# The base image already exposes port 8080 and runs as www-data user
-# No additional configuration needed as upstream image handles everything
+HEALTHCHECK --interval=60s --timeout=10s --start-period=40s --retries=3 \
+  CMD php artisan firefly-iii:output-version >/dev/null 2>&1 || exit 1
+
+USER www-data
